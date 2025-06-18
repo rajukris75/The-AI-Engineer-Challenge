@@ -1,0 +1,41 @@
+---
+description: When designing a frontend or frontend components.
+globs: 
+alwaysApply: false
+---
+# UI/UX Design & Accessibility
+
+- Maintain strong **contrast** between text and background to ensure accessibility (e.g., WCAG AA).
+- Avoid using white text on white or near-white backgrounds.
+- Use **responsive design**; the UI should adapt to different screen sizes gracefully.
+- Use **semantic HTML** (e.g., <main>, <section>, <label>) to improve accessibility and SEO.
+- Provide **accessible labels** and ARIA roles where appropriate (especially for form elements).
+- Ensure all interactive elements (e.g., buttons, links) are keyboard-navigable.
+
+# Layout & Components
+
+- Components (cards, boxes, modals) should **dynamically grow or shrink** based on content.
+- Do not use fixed heights unless absolutely necessary — use `min-height` and `max-height` if needed.
+- Use **flexbox** or **CSS grid** for layout structure — avoid absolute positioning unless required.
+- Use **margin and padding** consistently to prevent elements from overlapping or crowding.
+- Keep **font sizes readable** on both mobile and desktop (use `clamp()` or `rem` units when possible).
+- Use **spinners/loaders** for async operations (e.g., API calls).
+
+# Forms & Inputs
+
+- Use **password input type** (`<input type="password">`) when collecting sensitive data.
+- Validate form fields both on the client side and server side.
+- Provide **inline error messages** with visual feedback (e.g., red borders or messages under fields).
+- Auto-focus the first form field or modal input when opened.
+- Group related fields inside a `<fieldset>` with a `<legend>` when appropriate.
+
+# Framework & Deployment
+
+- Use **Next.js** (latest version) for frontend framework — best with Vercel.
+- Ensure the app works with both **SSR** (Server-Side Rendering) and **CSR** (Client-Side Rendering).
+- All environment variables should be handled through `.env.local` for local dev.
+- The app should run locally using:
+
+  ```bash
+  npm install
+  npm run dev
