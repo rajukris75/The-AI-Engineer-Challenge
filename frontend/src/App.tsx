@@ -29,7 +29,6 @@ interface ChatResponse {
 function App() {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
-  const [apiKey, setApiKey] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -51,10 +50,10 @@ function App() {
     e.preventDefault()
     setError(null)
 
-    if (!input.trim() || !apiKey.trim()) {
+    if (!input.trim()) {
       toast({
         title: 'Error',
-        description: 'Please enter both a message and an API key.',
+        description: 'Please enter a message.',
         status: 'error',
         duration: 5000,
         isClosable: true,
@@ -68,7 +67,7 @@ function App() {
     setIsLoading(true)
 
     try {
-      const response = await fetch('/api/chat', {
+      const response = await fetch('https://angelic-truth-production.up.railway.app/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -76,8 +75,7 @@ function App() {
         body: JSON.stringify({
           developer_message: 'You are a helpful AI assistant.',
           user_message: userMessage,
-          model: 'gpt-4.1-mini',
-          api_key: apiKey,
+          model: 'gpt-4.1-mini'
         }),
       })
 
@@ -139,17 +137,6 @@ function App() {
         <Heading as="h1" size="lg" textAlign="center" mb={4}>
           AI Chat Assistant
         </Heading>
-        
-        <Box>
-          <Input
-            type="password"
-            placeholder="Enter your OpenAI API key"
-            value={apiKey}
-            onChange={(e) => setApiKey(e.target.value)}
-            mb={4}
-            bg={bgColor}
-          />
-        </Box>
 
         {error && (
           <Alert status="error" mb={4}>
