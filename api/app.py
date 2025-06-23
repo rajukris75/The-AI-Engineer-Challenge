@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from openai import OpenAI, OpenAIError
 import asyncio
+import os
 from typing import Optional, AsyncGenerator
 
 # Initialize FastAPI app
@@ -18,20 +19,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Request schema
+# Request schema (no API key here!)
 class ChatRequest(BaseModel):
     developer_message: str
     user_message: str
-    model: Optional[str] = "gpt-4.1-mini"
-    api_key: str
+    model: Optional[str] = "gpt-4"
 
-# POST /api/chat endpoint
 @app.post("/api/chat")
 async def chat(request: ChatRequest):
     try:
-        client = OpenAI(api_key=request.api_key)
+        api_key = os.getenv("OPENAI_API_KEY")
+        if not api_key:
+            raise HTTPException(status_code=500, detail="Missing OPENAI_API_KEY in environment.")
 
-        # Define async generator for streaming response
+        client = OpenAI(api_key=api_key)
+
         async def generate() -> AsyncGenerator[str, None]:
             try:
                 stream = client.chat.completions.create(
@@ -40,14 +42,14 @@ async def chat(request: ChatRequest):
                         {"role": "system", "content": request.developer_message},
                         {"role": "user", "content": request.user_message},
                     ],
-                    stream=True
+                    stream=True,
                 )
 
                 for chunk in stream:
                     content = chunk.choices[0].delta.content
                     if content:
                         yield content
-                        await asyncio.sleep(0)  # Yield control to event loop
+                        await asyncio.sleep(0)
 
             except OpenAIError as e:
                 raise HTTPException(status_code=400, detail=f"OpenAI API error: {str(e)}")
@@ -61,12 +63,6 @@ async def chat(request: ChatRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Server error: {str(e)}")
 
-# GET /api/health
 @app.get("/api/health")
 async def health_check():
     return {"status": "ok"}
-
-# Run only if file is executed directly
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run("api.app:app", host="0.0.0.0", port=8000, reload=True)
